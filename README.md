@@ -1,5 +1,7 @@
 # progcart: Programação aplicada à Engenharia Cartográfica
 
+Versão local: João Inácio Adornes Nunes
+
 Professor: Maurício C. M. de Paulo - D.Sc.
 
 Curso distribuído sob licença MIT para aprimorar a qualidade do conteúdo. Caso tenha sugestões de melhoria, faça um pull request. Não sabe como? [Aprenda aqui](aulas/GIT.pdf).
