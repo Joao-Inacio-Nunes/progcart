@@ -2,16 +2,17 @@
 
 \usepackage{aula}
 
-\title{Interfaces gráficas desktop com PyQt6}
+\title{Interfaces gráficas desktop com PyQt5}
 \date{\today}
 
 \begin{document}
     
     \input{capa}
+    \sumario
     
-    \begin{frame}{Introdução ao PyQt6}
+    \begin{frame}{Introdução ao PyQt5}
         
-        \textbf{PyQt6} é um conjunto de bindings Python para o framework gráfico \textbf{Qt 6}.
+        \textbf{PyQt5} é um conjunto de bindings Python para o framework gráfico \textbf{Qt 5}.
         
         \vspace{0.3cm}
         
@@ -33,14 +34,14 @@
         
     \end{frame}
     
-    \begin{frame}[fragile]{Estrutura de uma aplicação PyQt6}
+    \begin{frame}[fragile]{Estrutura de uma aplicação PyQt5}
         
-        Toda aplicação PyQt6 segue o mesmo padrão:
+        Toda aplicação PyQt5 segue o mesmo padrão:
         
         \vspace{0.3cm}
         
         \begin{minted}{python}
-from PyQt6.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QApplication, QWidget
 import sys
 
 app = QApplication(sys.argv)
@@ -93,19 +94,26 @@ sys.exit(app.exec())
     
     \begin{frame}[fragile]{Sinais e Slots}
         
-        PyQt6 usa o modelo de \textbf{sinais e slots} para eventos.
+        PyQt5 usa o modelo de \textbf{sinais e slots} para eventos.
         
         \vspace{0.3cm}
         
         \begin{minted}{python}
-from PyQt6.QtWidgets import QPushButton
+from PyQt5.QtWidgets import QApplication, QPushButton, QMessageBox
+import sys
+
+app = QApplication(sys.argv)
 
 botao = QPushButton("Clique aqui")
 
 def ao_clicar():
     print("Botão clicado!")
+    QMessageBox.information(botao, "Mensagem", "Botão clicado!")
 
-botao.clicked.connect(ao_clicar)
+botao.clicked.connect(ao_clicar) # Conecta sinal ao slot.
+botao.show()
+
+app.exec()
         \end{minted}
         
         \vspace{0.3cm}
@@ -118,7 +126,7 @@ botao.clicked.connect(ao_clicar)
         
     \end{frame}
     
-    \begin{frame}{Boas práticas em PyQt6}
+    \begin{frame}{Boas práticas em PyQt5}
         
         \textbf{Recomendações:}
         \begin{itemize}
@@ -138,7 +146,9 @@ botao.clicked.connect(ao_clicar)
         
     \end{frame}
     
-    \begin{frame}{Aplicação PyQt6 — Qt Designer}
+    \section{Qt Designer}
+    
+    \begin{frame}{Aplicação PyQt5 — Qt Designer}
         
         \textbf{Qt Designer} é uma ferramenta visual para criar interfaces gráficas.
         
@@ -163,13 +173,13 @@ botao.clicked.connect(ao_clicar)
         
     \end{frame}
 
-    \begin{frame}{Aplicação PyQt6 — Qt Designer}
+    \begin{frame}{Aplicação PyQt5 — Qt Designer}
     
         \includegraphics[width=\textwidth]{pyqt_figs/designer}
     
     \end{frame}
     
-    \begin{frame}[fragile]{Aplicação PyQt6 — Estrutura mínima}
+    \begin{frame}[fragile]{Aplicação PyQt5 — Estrutura mínima}
         
         \textbf{Componentes principais:}
         \begin{itemize}
@@ -189,18 +199,18 @@ projeto/
         
     \end{frame}
     
-    \begin{frame}[fragile]{Aplicação PyQt6 — Código mínimo}
+    \begin{frame}[fragile]{Aplicação PyQt5 — Código mínimo}
         
         \begin{minted}{python}
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow
-from PyQt6.uic import loadUi
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.uic import loadUi
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         loadUi("main_window.ui", self)
-        self.setWindowTitle("Aplicação PyQt6 mínima")
+        self.setWindowTitle("Aplicação PyQt5 mínima")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -217,7 +227,7 @@ if __name__ == "__main__":
         
     \end{frame}
     
-    \begin{frame}[fragile]{PyQt6 — Acessando widgets do .ui}
+    \begin{frame}[fragile]{PyQt5 — Acessando widgets do .ui}
         
         Quando um arquivo \texttt{.ui} é carregado com \texttt{loadUi},  
         os widgets tornam-se atributos da classe.
@@ -225,17 +235,17 @@ if __name__ == "__main__":
         \vspace{0.3cm}
         
         \begin{minted}{python}
-from PyQt6.QtWidgets import QMainWindow
-from PyQt6.uic import loadUi
+from PyQt5.QtWidgets import QMainWindow
+from PyQt5.uic import loadUi
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         loadUi("main_window.ui", self)
 
-# Acessando widgets do .ui
-self.pushButton.setText("Clique aqui")
-self.label.setText("Olá, PyQt6!")
+        # Acessando widgets do .ui
+        self.pushButton.setText("Clique aqui")
+        self.label.setText("Olá, PyQt5!")
         \end{minted}
         
         \vspace{0.3cm}
@@ -248,7 +258,7 @@ self.label.setText("Olá, PyQt6!")
         
     \end{frame}
     
-    \begin{frame}[fragile]{PyQt6 — Conectando sinais}
+    \begin{frame}[fragile]{PyQt5 — Conectando sinais}
         
         Widgets emitem \textbf{sinais} quando algo acontece.
         
@@ -260,7 +270,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         loadUi("main_window.ui", self)
     
-    self.pushButton.clicked.connect(self.ao_clicar)
+        self.pushButton.clicked.connect(self.ao_clicar)
     
     def ao_clicar(self):
         self.label.setText("Botão clicado!")
@@ -277,7 +287,7 @@ class MainWindow(QMainWindow):
         
     \end{frame}
     
-    \begin{frame}[fragile]{PyQt6 — Sinais e Slots com .ui}
+    \begin{frame}[fragile]{PyQt5 — Sinais e Slots com .ui}
         
         \textbf{Sinais e slots} conectam eventos à lógica da aplicação.
         
@@ -310,7 +320,7 @@ def processar(self):
         
     \end{frame}
     
-    \begin{frame}{PyQt6 — Diagrama UML da aplicação}
+    \begin{frame}{PyQt5 — Diagrama UML da aplicação}
         
         \vspace{0.4cm}
         
@@ -343,6 +353,289 @@ def processar(self):
         
     \end{frame}
     
+    \section{Widgets mais comuns}
+    
+    \begin{frame}[fragile]{QPushButton}
+        
+        Botão clicável.
+        \vspace{0.3cm}
+        
+        \begin{columns}
+            
+            \column{0.48\textwidth}
+            \textbf{Signals}
+            \begin{itemize}
+                \item \texttt{clicked()}
+                \item \texttt{pressed()}
+                \item \texttt{released()}
+            \end{itemize}
+            
+            \textbf{Properties}
+            
+            \begin{itemize}
+                \item \texttt{text}
+                \item \texttt{enabled}
+                \item \texttt{checkable}
+            \end{itemize}
+            
+            \column{0.48\textwidth}
+            \textbf{Slots}
+            \begin{itemize}
+                \item \texttt{setText(str)}
+                \item \texttt{setEnabled(bool)}
+            \end{itemize}
+            
+            \textbf{Exemplo:}
+            
+            \includegraphics[width=0.3\linewidth]{pyqt_figs/pushbutton}
+
+        \end{columns}
+        
+
+        
+        \begin{minted}{python}
+self.pushButton.clicked.connect(self.executar)
+        \end{minted}
+        
+    \end{frame}
+    
+    \begin{frame}[fragile]{QComboBox}
+        
+        Lista suspensa de opções.
+        
+        \begin{columns}
+            
+            \column{0.48\textwidth}
+            \textbf{Signals}
+            \begin{itemize}
+                \item \texttt{currentIndexChanged(int)}
+                \item \texttt{currentTextChanged(str)}
+            \end{itemize}
+            
+            \textbf{Properties}
+            
+            \begin{itemize}
+                \item \texttt{currentIndex}
+                \item \texttt{currentText}
+                \item \texttt{count}
+            \end{itemize}
+            
+            \column{0.48\textwidth}
+            \textbf{Slots}
+            \begin{itemize}
+                \item \texttt{addItem(str)}
+                \item \texttt{setCurrentIndex(int)}
+            \end{itemize}
+            
+            \textbf{Exemplo:}
+            
+            \includegraphics[width=0.4\linewidth]{pyqt_figs/combobox}
+        \end{columns}
+        
+
+        
+        \begin{minted}{python}
+texto = self.comboBox.currentText()
+        \end{minted}
+        
+    \end{frame}
+    
+    \begin{frame}[fragile]{QListWidget}
+        
+        Lista de itens selecionáveis.
+        
+        \begin{columns}
+            
+            \column[t]{0.48\textwidth}
+            \textbf{Signals}
+            \begin{itemize}
+                \item \texttt{itemClicked()}
+                \item \texttt{currentItemChanged()}
+            \end{itemize}
+            
+            \textbf{Properties}
+            
+            \begin{itemize}
+                \item \texttt{currentRow}
+                \item \texttt{count}
+            \end{itemize}
+            
+            \column[t]{0.48\textwidth}
+            \textbf{Slots}
+            \begin{itemize}
+                \item \texttt{addItem(str)}
+                \item \texttt{clear()}
+            \end{itemize}
+            \textbf{Exemplo:}
+            
+            \includegraphics[width=0.6\linewidth]{pyqt_figs/listwidget}
+        \end{columns}
+        
+
+        
+        \begin{minted}{python}
+item = self.listWidget.currentItem().text()
+        \end{minted}
+        
+    \end{frame}
+    
+    \begin{frame}[fragile]{QLineEdit}
+        
+        Campo de entrada de texto.
+        
+        \begin{columns}
+            
+            \column[t]{0.48\textwidth}
+            \textbf{Signals}
+            \begin{itemize}
+                \item \texttt{textChanged(str)}
+                \item \texttt{returnPressed()}
+                \item \texttt{editingFinished()}
+            \end{itemize}
+            \textbf{Properties}
+            
+            \begin{itemize}
+                \item \texttt{text}
+                \item \texttt{placeholderText}
+            \end{itemize}
+            
+            \column[t]{0.48\textwidth}
+            \textbf{Slots}
+            \begin{itemize}
+                \item \texttt{setText(str)}
+                \item \texttt{clear()}
+            \end{itemize}
+            
+            \textbf{Exemplo:}
+            
+            \includegraphics[width=0.6\linewidth]{pyqt_figs/lineedit}
+        \end{columns}
+        
+
+        
+        \begin{minted}{python}
+texto = self.lineEdit.text()
+        \end{minted}
+        
+    \end{frame}
+    
+    \begin{frame}[fragile]{QPlainTextEdit}
+        
+        Área de texto multilinha.
+        
+        \begin{columns}
+            
+            \column[t]{0.48\textwidth}
+            \textbf{Signals}
+            \begin{itemize}
+                \item \texttt{textChanged()}
+            \end{itemize}
+            
+            \textbf{Properties}
+            
+            \begin{itemize}
+                \item \texttt{plainText}
+                \item \texttt{readOnly}
+            \end{itemize}
+            
+            \column[t]{0.48\textwidth}
+            \textbf{Slots}
+            \begin{itemize}
+                \item \texttt{setPlainText(str)}
+                \item \texttt{appendPlainText(str)}
+                \item \texttt{clear()}
+            \end{itemize}
+            \textbf{Exemplo:}
+            
+            \includegraphics[width=0.6\linewidth]{pyqt_figs/textedit}
+        \end{columns}
+        
+        
+        
+        \begin{minted}{python}
+texto = self.plainTextEdit.toPlainText()
+        \end{minted}
+        
+    \end{frame}
+    
+    \begin{frame}[fragile]{QDateEdit}
+        
+        Seleção de datas.
+        
+        \begin{columns}
+            
+            \column[t]{0.48\textwidth}
+            \textbf{Signals}
+            \begin{itemize}
+                \item \texttt{dateChanged(QDate)}
+            \end{itemize}
+            
+             \textbf{Properties}
+            
+            \begin{itemize}
+                \item \texttt{date}
+                \item \texttt{minimumDate}
+                \item \texttt{maximumDate}
+            \end{itemize}
+            
+            \column[t]{0.48\textwidth}
+            \textbf{Slots}
+            \begin{itemize}
+                \item \texttt{setDate(QDate)}
+            \end{itemize}
+            \textbf{Exemplo:}
+            
+            \includegraphics[width=0.3\linewidth]{pyqt_figs/dateedit}
+        \end{columns}
+        
+       
+        
+        \begin{minted}{python}
+data = self.dateEdit.date()
+        \end{minted}
+        
+    \end{frame}
+    
+    \begin{frame}[fragile]{QDoubleSpinBox}
+        
+        Entrada numérica com incremento.
+        
+        \begin{columns}
+            
+            \column{0.48\textwidth}
+            \textbf{Signals}
+            \begin{itemize}
+                \item \texttt{valueChanged(float)}
+            \end{itemize}
+            \textbf{Properties}
+            
+            \begin{itemize}
+                \item \texttt{value}
+                \item \texttt{minimum}
+                \item \texttt{maximum}
+                \item \texttt{singleStep}
+            \end{itemize}
+            
+            \column{0.48\textwidth}
+            \textbf{Slots}
+            \begin{itemize}
+                \item \texttt{setValue(float)}
+                \item \texttt{setRange(min,max)}
+            \end{itemize}
+            \textbf{Exemplo:}
+            
+            \includegraphics[width=0.3\linewidth]{pyqt_figs/doublespinbox}
+        \end{columns}
+        
+
+        
+        \begin{minted}{python}
+valor = self.doubleSpinBox.value()
+        \end{minted}
+        
+    \end{frame}
+
+\section{Plots da MatPlotLib em PyQt}
 
 \begin{frame}[fragile]{Plots da MatPlotLib em PyQt}
     A MatPlotLib já tem widgets para PyQt prontas no backend qtagg.
@@ -350,6 +643,8 @@ def processar(self):
 import sys
 import time
 import numpy as np
+import matplotlib
+matplotlib.use('Qt5Agg')
 
 from matplotlib.backends.backend_qtagg import FigureCanvas
 from matplotlib.backends.backend_qtagg import \
@@ -370,12 +665,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         # Carrega a MainWindow que tem um objeto verticalLayout
         uic.loadUi('plot.ui', self)
     
-    # Cria um canvas da MatPlotLib integrado à PyQt
-    self.static_canvas = FigureCanvas(Figure(figsize=(5, 3)))
-    #  Adiciona a barra de navegação no layout
-    self.verticalLayout.addWidget(NavigationToolbar(self.static_canvas, self))
-    # Adiciona o canvas no layout
-    self.verticalLayout.addWidget(self.static_canvas)
+        # Cria um canvas da MatPlotLib integrado à PyQt
+        self.static_canvas = FigureCanvas(Figure(figsize=(5, 3)))
+        #  Adiciona a barra de navegação no layout
+        self.verticalLayout.addWidget(NavigationToolbar(self.static_canvas, self))
+        # Adiciona o canvas no layout
+        self.verticalLayout.addWidget(self.static_canvas)
     
     def draw_plot(self): # Função que gera os dados e desenha
         self._static_ax = self.static_canvas.figure.subplots()
@@ -399,8 +694,10 @@ if __name__ == "__main__":
     \end{minted}
 \end{frame}
 
+\section{PyInstaller: Arquivos executáveis com Python}
+
 % Slide 1
-\begin{frame}[fragile]{Empacotando PyQt6 com Pixi}
+\begin{frame}[fragile]{Empacotando PyQt5 com Pixi}
     \textbf{Objetivo:} gerar executável (.exe) mantendo ambiente reprodutível.
     
     \vspace{0.4cm}
@@ -427,14 +724,37 @@ pixi add python pyqt pyinstaller
     \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]{Executando PyInstaller via Pixi}
+    \begin{minted}{python}
+import sys, os
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.uic import loadUi
+
+# Verifica o caminho do arquivo ui no pyinstaller
+base_path = getattr(sys, '_MEIPASS', ".")
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        loadUi(os.path.join(base_path,"main_windo.ui"), self)
+        self.setWindowTitle("Aplicação PyQt5 mínima")
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
+    \end{minted}
+\end{frame}
+
 % Slide 2
 \begin{frame}[fragile]{Executando PyInstaller via Pixi}
     \textbf{Rodar dentro do ambiente Pixi:}
     
     \begin{minted}{bash}
-pixi run pyinstaller --onefile --windowed main.py
+pyinstaller --onefile --windowed --add-data="main_window.ui:." main.py
     \end{minted}
-    
+     
     \vspace{0.4cm}
     
     Arquivos gerados:
@@ -452,6 +772,7 @@ pixi run pyinstaller --onefile --windowed main.py
         \item Build consistente entre máquinas
     \end{itemize}
 \end{frame}
+
 
 % Slide 3
 \begin{frame}[fragile]{Automatizando com pixi.toml}

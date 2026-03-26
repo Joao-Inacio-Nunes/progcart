@@ -47,7 +47,23 @@ app.exitQgis()
     \end{minted}
 \end{frame}
 
-\begin{frame}{Projeto e Singleton}
+\begin{frame}[fragile]{Scripts Python no QGIS}
+    \textbf{Terminal Python}
+    O terminal Python do QGIS permite executar comandos de forma interativa.
+    \begin{center}
+        \includegraphics[width=0.71\linewidth]{pyqgis_figs/python_console1}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Scripts Python no QGIS}
+    \textbf{Editor de scripts Python}
+    O Editor de scripts Python do QGIS permite editar e executar scripts inteiros.
+    \begin{center}
+        \includegraphics[width=0.71\linewidth]{pyqgis_figs/python_console2}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Manipulação da estrutura do Projeto no QGIS}
     \textbf{QgsProject}
     
     \begin{itemize}
@@ -58,11 +74,12 @@ app.exitQgis()
     
     \vspace{0.4cm}
     
-    \textbf{Acesso global:}
+    \textbf{Obter a instância (global) do projeto}
     
-    \begin{center}
-        \texttt{QgsProject.instance()}
-    \end{center}
+    \begin{minted}{python}
+from qgis.core import QgsProject
+project = QgsProject.instance()
+    \end{minted}
     
     \vspace{0.3cm}
     
@@ -72,6 +89,55 @@ app.exitQgis()
         \item Remover camadas
         \item Acessar CRS do projeto
     \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{PyQGIS — QgsProject.instance()}
+    
+    \textbf{QgsProject.instance()} fornece acesso ao \textbf{projeto QGIS atualmente aberto}.  
+    É o ponto central para acessar \textbf{camadas, CRS, caminhos e estado do projeto}.
+    
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}
+        
+        \column{0.5\textwidth}
+        \textbf{Gerenciamento de camadas}
+        
+        \begin{minted}{python}
+project.mapLayers()
+
+project.mapLayersByName("rios")
+
+project.addMapLayer(layer)
+
+project.removeMapLayer(layer.id())
+        \end{minted}
+        
+        \column{0.5\textwidth}
+        \textbf{Informações do projeto}
+        
+        \begin{minted}{python}
+project.fileName()
+
+project.homePath()
+
+project.crs()
+
+project.setCrs(crs)
+        \end{minted}
+        
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Exemplo: listar camadas}
+    
+    \begin{minted}{python}
+for layer in project.mapLayers().values():
+    print(layer.name())
+    \end{minted}
+    
 \end{frame}
 
 \begin{frame}{Providers}
@@ -120,85 +186,137 @@ app.exitQgis()
     \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{Iterando Feições}
-    \begin{minted}{python}
-layer = iface.activeLayer()
-
-for feat in layer.getFeatures():
-    geom = feat.geometry()
-    attrs = feat.attributes()
-
-print(geom.area(), attrs)
-    \end{minted}
+\begin{frame}[fragile]{QgsVectorLayer: diferentes fontes}
+    
+    A classe \texttt{QgsVectorLayer} permite acessar dados vetoriais de diversos formatos.
     
     \vspace{0.3cm}
     
-    \textbf{Observação:}
-    \begin{itemize}
-        \item Iteração é lazy (generator)
-        \item Geometria e atributos são acessados separadamente
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{Geometria (QgsGeometry)}
-    Operações comuns:
-    
-    \begin{itemize}
-        \item \texttt{area()}
-        \item \texttt{length()}
-        \item \texttt{buffer()}
-        \item \texttt{intersection()}
-        \item \texttt{difference()}
-    \end{itemize}
-    
-    \vspace{0.4cm}
-    
-    Conversões:
-    \begin{itemize}
-        \item WKT
-        \item WKB
-        \item GeoJSON
-    \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Edição de Camadas}
     \begin{minted}{python}
-layer.startEditing()
-
-for feat in layer.getFeatures():
-    feat["area"] = feat.geometry().area()
-    layer.updateFeature(feat)
-
-layer.commitChanges()
+from qgis.core import QgsVectorLayer, QgsProject
     \end{minted}
+    
+    \begin{columns}
+        
+        \column[t]{0.5\textwidth}
+        \textbf{Shapefile}
+        
+        \begin{minted}{python}
+layer = QgsVectorLayer(
+    "/dados/rios.shp",
+    "Nome da camada",
+    "ogr"
+)
+        \end{minted}
+        
+        \textbf{GeoPackage}
+        
+        \begin{minted}{python}
+layer = QgsVectorLayer(
+    "/dados/brasil.gpkg|"\
+    "layername=estados",
+    "Nome da camada",
+    "ogr"
+)
+        \end{minted}
+        
+        \column[t]{0.5\textwidth}
+        
+        \textbf{PostGIS}
+        
+        \begin{minted}{python}
+uri = "dbname='gis' host=localhost \
+port=5432 user='postgres' \
+"password='123' \
+table=\"public\".\"municipios\" (geom)"
+
+layer = QgsVectorLayer(uri,
+    "Nome da camada",
+    "postgres"
+)
+        \end{minted}
+        
+        \textbf{Adicionar ao projeto}
+        
+        \begin{minted}{python}
+QgsProject.instance().addMapLayer(layer)
+        \end{minted}
+        
+    \end{columns}
+    
+\end{frame}
+
+
+\begin{frame}[fragile]{QgsRasterLayer: diferentes fontes}
+    
+    A classe \texttt{QgsRasterLayer} permite acessar dados matriciais de diversas fontes.
     
     \vspace{0.3cm}
     
-    \textbf{Regra importante:}
-    \begin{itemize}
-        \item Sempre iniciar e finalizar modo de edição
-    \end{itemize}
+    \begin{minted}{python}
+from qgis.core import QgsRasterLayer, QgsProject
+    \end{minted}
+    
+    \begin{columns}
+        
+        \column[t]{0.5\textwidth}
+        \textbf{GeoTIFF}
+        
+        \begin{minted}{python}
+layer = QgsRasterLayer(
+    "/dados/imagem.tif",
+    "Nome da camada",
+    "gdal"
+)
+        \end{minted}
+        
+        \textbf{COG (Cloud Optimized GeoTIFF)}
+        
+        \begin{minted}{python}
+url = "https://exemplo.com/imagem.tif"
+layer = QgsRasterLayer(
+    url,
+    "Nome da camada",
+    "gdal"
+)
+        \end{minted}
+        
+        \column[t]{0.5\textwidth}
+        
+        \textbf{WMS}
+        
+        \begin{minted}{python}
+url = "crs=EPSG:4326&"\
+      "format=image/png&"\
+      "layers=ctm25&"\
+      "styles&"\
+      "url=https://bdgex.eb.mil.br/mapcache"
+
+layer = QgsRasterLayer(
+    url,
+    "Nome da camada",
+    "wms"
+)
+        \end{minted}
+        
+        \textbf{Adicionar ao projeto}
+        
+        \begin{minted}{python}
+QgsProject.instance().addMapLayer(layer)
+        \end{minted}
+        
+    \end{columns}
+    
 \end{frame}
 
-\begin{frame}{CRS e Transformações}
-    Classes importantes:
+\begin{frame}[fragile]{Tipos de camada no QGIS}
     
-    \begin{itemize}
-        \item \textbf{QgsCoordinateReferenceSystem}
-        \item \textbf{QgsCoordinateTransform}
-    \end{itemize}
-    
-    \vspace{0.4cm}
-    
-    Transformação típica:
-    \begin{itemize}
-        \item CRS origem
-        \item CRS destino
-        \item Contexto do projeto
-    \end{itemize}
-    
-    Essencial para operações métricas corretas.
+    \begin{center}
+        \includegraphics[width=0.8\linewidth]{pyqgis_figs/classQgsMapLayer__inherit__graph}
+        \url{https://api.qgis.org/api/classQgsMapLayer.html}
+    \end{center}
 \end{frame}
+
 
 \begin{frame}{Automação e Scripts Standalone}
     \textbf{Objetivo:}
@@ -248,21 +366,21 @@ layer.commitChanges()
 
 \begin{frame}[fragile]{Estrutura Mínima de Script Standalone}
     \begin{minted}{python}
-        from qgis.core import *
-        from qgis.PyQt.QtWidgets import QApplication
-        import sys
-        
-        QgsApplication.setPrefixPath(
-        "/usr", True
-        )
-        
-        app = QApplication(sys.argv)
-        qgs = QgsApplication([], False)
-        qgs.initQgis()
-        
-        # --- código aqui ---
-        
-        qgs.exitQgis()
+from qgis.core import *
+from qgis.PyQt.QtWidgets import QApplication
+import sys
+
+QgsApplication.setPrefixPath(
+    "/usr", True
+)
+
+app = QApplication(sys.argv)
+qgs = QgsApplication([], False)
+qgs.initQgis()
+
+# --- código aqui ---
+
+qgs.exitQgis()
     \end{minted}
 \end{frame}
 
@@ -283,34 +401,19 @@ layer.commitChanges()
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Carregando Camada Vetorial}
-    \begin{minted}{python}
-        layer = QgsVectorLayer(
-        "/dados/limites.shp",
-        "limites",
-        "ogr"
-        )
-        
-        if not layer.isValid():
-        raise Exception("Camada inválida")
-    \end{minted}
-    
-    \textbf{Importante:}
-    Sem projeto QGIS carregado, tudo deve ser instanciado manualmente.
-\end{frame}
 
 \begin{frame}[fragile]{Executando Processing Standalone}
     \begin{minted}{python}
-        import processing
-        from processing.core.Processing import Processing
-        
-        Processing.initialize()
-        
-        result = processing.run("native:buffer", {
-            "INPUT": layer,
-            "DISTANCE": 100,
-            "OUTPUT": "/dados/buffer.shp"
-        })
+import processing
+from processing.core.Processing import Processing
+
+Processing.initialize()
+
+result = processing.run("native:buffer", {
+    "INPUT": layer,
+    "DISTANCE": 100,
+    "OUTPUT": "/dados/buffer.shp"
+})
     \end{minted}
     
     \textbf{Observação:}
