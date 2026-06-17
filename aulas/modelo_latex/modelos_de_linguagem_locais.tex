@@ -54,54 +54,79 @@
 \end{frame}
 
 % Slide 5
-\begin{frame}{Instalação com Docker}
+\begin{frame}[fragile]{Instalação com Docker}
+\textbf{Baixar, criar o container e executar o serviço ollama.}
+\begin{minted}{bash}
+docker run -d -p 11434:11434 ollama/ollama:latest --name ollama
+\end{minted}
+\textbf{Parar ou iniciar (depois de criado)}
+\begin{minted}{bash}
+docker start ollama
+docker stop ollama
+\end{minted}
+
+\textbf{Baixar um modelo de linguagem. \href{https://ollama.com/search}{Lista de mmodelos}.}
+\begin{itemize}
+\item LiquidAI/lfm2.5-1.2b-instruct
+\item gemma4
+\end{itemize}
+\begin{minted}{bash}
+docker exec -it ollama ollama pull LiquidAI/lfm2.5-1.2b-instruct
+\end{minted}
+
+\textbf{Iniciar o servidor de modelos de linguagem.}
+\begin{minted}{bash}
+docker exec -it ollama ollama
+\end{minted}
 
 \end{frame}
 
 % Slide 6
-\begin{frame}{Baixando um Modelo}
+\begin{frame}[fragile]{Baixando um Modelo}
 Após iniciar o container:
 
-\begin{verbatim}
-docker exec -it ollama ollama pull llama3
-\end{verbatim}
+\begin{minted}{bash}
+docker exec -it ollama ollama pull llama3.1
+\end{minted}
 
 Ou via API:
-\begin{verbatim}
+\begin{minted}{bash}
 curl http://localhost:11434/api/pull \
 -d '{"name": "llama3"}'
-\end{verbatim}
+\end{minted}
 \textbf{1. Baixar a imagem oficial:}
-\begin{verbatim}
+\begin{minted}{bash}
     docker pull ollama/ollama
-\end{verbatim}
+\end{minted}
 
 \textbf{2. Executar o container:}
-\begin{verbatim}
+\begin{minted}{bash}
     docker run -d \
     -v ollama:/root/.ollama \
     -p 11434:11434 \
     --name ollama \
     ollama/ollama
-    \end{verbatim}\end{frame}
+\end{minted}
+
+\end{frame}
 
 % Slide 7
-\begin{frame}{Executando o Modelo}
+\begin{frame}[fragile]{Executando o Modelo}
 Via CLI:
 
-\begin{verbatim}
+\begin{minted}{bash}
 docker exec -it ollama ollama run llama3
-\end{verbatim}
+\end{minted}
 
 Via API:
 
-\begin{verbatim}
+\begin{minted}{bash}
 curl http://localhost:11434/api/generate \
 -d '{
   "model": "llama3",
   "prompt": "Explique LLMs"
 }'
-\end{verbatim}
+\end{minted}
 \end{frame}
 
 % Slide 8
@@ -121,16 +146,16 @@ curl http://localhost:11434/api/generate \
 \end{frame}
 
 % Slide 9
-\begin{frame}{Gerenciamento de Modelos}
+\begin{frame}[fragile]{Gerenciamento de Modelos}
     \begin{itemize}
         \item Listar modelos:
-\begin{verbatim}
+\begin{minted}{bash}
 ollama list
-\end{verbatim}
+\end{minted}
         \item Remover modelo:
-\begin{verbatim}
+\begin{minted}{bash}
 ollama rm llama3
-\end{verbatim}
+\end{minted}
         \item Versionamento automático
     \end{itemize}
 \end{frame}
@@ -147,7 +172,7 @@ ollama rm llama3
 \end{frame}
 
 % Slide Extra
-\begin{frame}{Controle do Ollama com Open WebUI}
+\begin{frame}[fragile]{Controle do Ollama com Open WebUI}
     
     \textbf{Arquitetura:}
     \begin{itemize}
@@ -160,13 +185,13 @@ ollama rm llama3
     
     \textbf{Executando Open WebUI com Docker:}
     
-    \begin{verbatim}
+    \begin{minted}{bash}
         docker run -d \
         -p 3000:8080 \
         -e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
         --name openwebui \
         ghcr.io/open-webui/open-webui:main
-    \end{verbatim}
+    \end{minted}
     
     \vspace{0.3cm}
     
