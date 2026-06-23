@@ -4,7 +4,7 @@
 %pdflatex -shell-escape -synctex=1 -interaction=nonstopmode  -output-directory=build  %.tex
 
 \usepackage{aula}
-
+\usetikzlibrary{shapes.geometric, positioning}
 \title{Contêineres}
 \date{\today}
 
@@ -12,7 +12,7 @@
     
 \input{capa}
 
-
+\section{Conceitos de containerização}
 \begin{frame}{Docker: Conceito geral}
     
     \textbf{Docker} é uma plataforma para executar aplicações em \textbf{containers}.
@@ -40,6 +40,41 @@
     
 \end{frame}
 
+\begin{frame}[fragile]{Docker: Instalação no Windows}
+    
+    No Windows, Docker é instalado através do \textbf{Docker Desktop}.
+    
+    \vspace{0.3cm}
+    \textbf{1. Instalar o subsistema Linux do Windows (WSL)}
+    \begin{minted}{powershell}
+wsl --install
+    \end{minted}   
+    
+    \textbf{2. Instalar o Docker via Winget}
+    
+    \begin{minted}{powershell}
+winget install Docker.DockerDesktop
+    \end{minted}
+    
+    \textbf{3. Reiniciar o computador}
+    
+    \textbf{4. Verificar instalação}
+    
+    \begin{minted}{bash}
+docker --version
+docker run hello-world
+    \end{minted}
+    
+    \textbf{Requisitos}
+    
+    \begin{itemize}
+        \item Windows 10 ou 11
+        \item Virtualização habilitada
+        \item WSL2 instalado
+    \end{itemize}
+    
+\end{frame}
+
 \begin{frame}{Docker: Arquitetura}
     
     \begin{center}
@@ -49,7 +84,7 @@
             \node[draw, rectangle, minimum width=3cm] (app) {Aplicação};
             
             \node[draw, rectangle, minimum width=4cm, below of=app] (container)
-            {Container \\ (bibliotecas + runtime)};
+            {Container  (bibliotecas + runtime)};
             
             \node[draw, rectangle, minimum width=4cm, below of=container] (engine)
             {Docker Engine};
@@ -93,7 +128,7 @@
     \textbf{Exemplo de execução}
     
     \begin{minted}{bash}
-        docker run hello-world
+docker run hello-world
     \end{minted}
     
     Fluxo típico:
@@ -127,49 +162,14 @@ CMD ["python", "app.py"]
     Construção da imagem:
     
     \begin{minted}{bash}
-        docker build -t meu_app .
+docker build -t meu_app .
     \end{minted}
     
     Execução:
     
     \begin{minted}{bash}
-        docker run meu_app
+docker run meu_app
     \end{minted}
-    
-\end{frame}
-
-\begin{frame}[fragile]{Docker: Instalação no Windows}
-    
-    Docker é instalado através do \textbf{Docker Desktop}.
-    
-    \vspace{0.3cm}
-    \textbf{1. Instalar o subsistema Linux do Windows (WSL)}
-    \begin{minted}{powershell}
-        wsl --install
-    \end{minted}   
-    
-    \textbf{2. Instalar o Docker via Winget}
-    
-    \begin{minted}{powershell}
-        winget install Docker.DockerDesktop
-    \end{minted}
-    
-    \textbf{3. Reiniciar o computador}
-    
-    \textbf{4. Verificar instalação}
-    
-    \begin{minted}{bash}
-        docker --version
-        docker run hello-world
-    \end{minted}
-    
-    \textbf{Requisitos}
-    
-    \begin{itemize}
-        \item Windows 10 ou 11
-        \item Virtualização habilitada
-        \item WSL2 instalado
-    \end{itemize}
     
 \end{frame}
 
@@ -210,6 +210,16 @@ CMD ["python", "app.py"]
     
 \end{frame}
 
+\begin{frame}{Tipos de hospedagem para sistemas web}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{bancos_de_dados_relacionais_figs/iaas-paas-saas-diagram5.1-1638x1046}
+\caption{Quero hospedar meu site. O que um datacenter pode me oferecer? Fonte: \url{https://www.redhat.com/pt-br/topics/cloud-computing/iaas-vs-paas-vs-saas}}
+\end{figure}
+
+\end{frame}
+
 \begin{frame}[fragile]{Docker Volumes — Persistência de dados}
     
     Containers são \textbf{efêmeros}: quando removidos, os dados internos são perdidos.
@@ -220,16 +230,25 @@ CMD ["python", "app.py"]
     
     \begin{center}
         
-        \begin{tikzpicture}[node distance=1.2cm]
+        \begin{tikzpicture}[node distance=0.1cm]
             
             \node[draw, rectangle, minimum width=3.2cm] (container) {Container};
             
-            \node[draw, cylinder, shape border rotate=90,
-            minimum height=1.2cm, minimum width=2cm,
-            below of=container] (volume) {Volume};
+            \node[
+                draw,
+                cylinder,
+                shape border rotate=90,
+                minimum height=0.2cm,
+                minimum width=2cm,
+                below=of container
+            ] (volume) {Volume};
             
-            \node[draw, rectangle, minimum width=3.2cm,
-            below of=volume] (host) {Disco do Host};
+            \node[
+                draw,
+                rectangle,
+                minimum width=1.2cm,
+                below=of volume
+            ] (host) {Disco do Host};
             
             \draw[->] (container) -- (volume);
             \draw[->] (volume) -- (host);
@@ -277,12 +296,27 @@ docker exec -it postgis psql -U postgres
         \item Python (psycopg)
     \end{itemize}
     
-    Exemplo SQL:
+
+    
+\end{frame}
+
+\section{PostgreSQL+PostGIS em Docker}
+
+\begin{frame}[fragile]{PostGIS em Docker}
+    A imagem postgis/postgis já carrega a extensão espacial PostGIS e todos bancos de dados criados. 
+    \vspace{0.3cm}
+
+    Teste se o postgis estáinstalado no banco. (acessar o banco usando psql)
     
     \begin{minted}{sql}
 SELECT PostGIS_Version();
     \end{minted}
-    
+
+    Não é necessário executar o comando: 
+    \begin{minted}{sql}
+CREATE EXTENSION PostGIS;
+    \end{minted}
+
 \end{frame}
 
 \begin{frame}[fragile]{Comandos úteis do Docker}
@@ -328,6 +362,81 @@ docker container rm postgis
 \centering 
 Lista de comandos docker úteis (mas você pode fazer pelo Desktop).
 \large \url{https://docs.docker.com/get-started/docker_cheatsheet.pdf}
+\end{frame}
+
+\section{PostgreSQL+PostGIS com Docker compose}
+
+\begin{frame}[fragile]{Docker Compose: Conceitos}
+
+\textbf{Docker Compose} permite definir e executar múltiplos containers usando um único arquivo YAML.
+
+\vspace{0.4cm}
+
+\textbf{Principais conceitos:}
+
+\begin{itemize}
+    \item \textbf{services}
+    \begin{itemize}
+        \item Containers da aplicação
+    \end{itemize}
+
+    \item \textbf{image}
+    \begin{itemize}
+        \item Imagem Docker utilizada
+    \end{itemize}
+
+    \item \textbf{ports}
+    \begin{itemize}
+        \item Mapeamento de portas
+    \end{itemize}
+
+    \item \textbf{volumes}
+    \begin{itemize}
+        \item Persistência de dados
+    \end{itemize}
+
+    \item \textbf{environment}
+    \begin{itemize}
+        \item Variáveis de ambiente
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.4cm}
+
+\textbf{Execução:}
+
+\begin{minted}{bash}
+docker compose up -d
+\end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]{Exemplo: PostGIS com Docker Compose}
+Salvar em \textbf{docker-compose.ym}l e executar \textbf{ docker compose up} .
+\begin{minted}{yaml}
+version: '3.9'
+
+services: # Todos os containers serao descritos aqui
+  postgis: # Nome do container no compose
+    image: postgis/postgis # Imagem a ser utilizada: PostgreSQL + PostGIS
+    container_name: postgis # Nome do container
+    restart: unless-stopped # Reinício automático do serviço
+
+    ports:
+      - "5432:5432" # Porta local 5432 → container 5432
+
+    environment: # Variáveis de ambiente
+      POSTGRES_PASSWORD: postgres
+
+    volumes:  # Ligações entre pastas do hospedeiro e do container.
+      - dados_postgres:/var/lib/postgresql/data
+
+volumes: # Lista de volumes. Vários containers podem usar os mesmos volumes.
+  dados_postgres: # Volume mantém os dados persistentes
+\end{minted}
+
+\vspace{0.3cm}
+
 \end{frame}
 
 \end{document}

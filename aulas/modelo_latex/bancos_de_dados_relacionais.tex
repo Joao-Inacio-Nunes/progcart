@@ -9,15 +9,14 @@
     
 \input{capa}
 
-
-
+\section{Conceitos básicos de banco de dados geográficos}
 \begin{frame}{Conceitos Fundamentais}
     \textbf{Banco de Dados Relacional (BDR)}:
     
     \begin{itemize}
         \item Dados organizados em tabelas (relações)
-        \item Linhas → tuplas
-        \item Colunas → atributos
+        \item Linhas $\rightarrow$ tuplas
+        \item Colunas $\rightarrow$ atributos
         \item Chaves primárias e estrangeiras
     \end{itemize}
     
@@ -38,173 +37,6 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{SQL — Structured Query Language}
-    
-    \textbf{SQL} é a linguagem padrão para manipulação de bancos de dados relacionais.
-    
-    \vspace{0.4cm}
-    
-    Principais usos:
-    
-    \begin{itemize}
-        \item Consultar dados
-        \item Inserir novos registros
-        \item Atualizar registros existentes
-        \item Remover dados
-        \item Definir estrutura de tabelas
-    \end{itemize}
-    
-    \vspace{0.4cm}
-    
-    Bancos que utilizam SQL:
-    
-    \begin{itemize}
-        \item PostgreSQL 
-        \item MySQL
-        \item SQLite (e Geopackage)
-        \item DuckDB
-        \item SQL Server
-    \end{itemize}
-    
-\end{frame}
-
-\begin{frame}[fragile]{Postgis no Docker}
-    
-    Recuperando nosso container de PostgreSQL+PostGIS da aula passada.
-    
-    \vspace{0.4cm}
-    Iniciando o container
-    \begin{minted}{bash}
-docker start postgis
-    \end{minted}
-    
-    Criando um banco novo
-    \begin{minted}{bash}
-docker exec -it postgis createdb geodb -U postgres
-    \end{minted}
-    
-    Conectando ao banco pelo terminal
-    \begin{minted}{bash}
-docker exec -it postgis psql -U postgres -d geodb
-    \end{minted}    
-
-\end{frame}
-
-\begin{frame}[fragile]{Estrutura básica de uma consulta}
-    
-    A operação mais comum em SQL é a consulta de dados usando \texttt{SELECT}.
-    
-    \begin{minted}{sql}
-SELECT coluna1, coluna2
-FROM tabela
-WHERE condicao;
-    \end{minted}
-    
-    Componentes:
-    
-    \begin{itemize}
-        \item \textbf{SELECT} — define as colunas retornadas
-        \item \textbf{FROM} — define a tabela consultada
-        \item \textbf{WHERE} — filtra os registros
-    \end{itemize}
-    
-    Exemplo:
-    
-    \begin{minted}{sql}
-SELECT nome, populacao
-FROM cidades
-WHERE populacao > 100000;
-    \end{minted}
-    
-\end{frame}
-
-\begin{frame}[fragile]{Inserindo, atualizando e removendo dados}
-    
-    SQL também permite modificar os dados.
-    
-    \vspace{0.3cm}
-    
-    Inserir registros:
-    
-    \begin{minted}{sql}
-INSERT INTO cidades (nome, populacao)
-VALUES ('Campinas', 1214000);
-    \end{minted}
-    
-    Atualizar registros:
-    
-    \begin{minted}{sql}
-UPDATE cidades
-SET populacao = 1300000
-WHERE nome = 'Campinas';
-    \end{minted}
-    
-    Remover registros:
-    
-    \begin{minted}{sql}
-DELETE FROM cidades
-WHERE nome = 'Campinas';
-    \end{minted}
-    
-\end{frame}
-
-\begin{frame}[fragile]{Operações de agregação}
-    
-    Funções de agregação resumem dados.
-    
-    \begin{minted}{sql}
-SELECT COUNT(*)
-FROM cidades;
-    \end{minted}
-    
-    Funções comuns:
-    
-    \begin{itemize}
-        \item \texttt{COUNT()} — número de registros
-        \item \texttt{SUM()} — soma
-        \item \texttt{AVG()} — média
-        \item \texttt{MIN()} — valor mínimo
-        \item \texttt{MAX()} — valor máximo
-    \end{itemize}
-    
-    Exemplo:
-    
-    \begin{minted}{sql}
-SELECT AVG(populacao)
-FROM cidades;
-    \end{minted}
-    
-\end{frame}
-
-\begin{frame}[fragile]{Relacionando tabelas — JOIN}
-    
-    Bancos relacionais permitem combinar dados de várias tabelas.
-    
-    Exemplo de duas tabelas:
-    
-    \begin{itemize}
-        \item cidades
-        \item estados
-    \end{itemize}
-    
-    Consulta com \textbf{JOIN}:
-    
-    \begin{minted}{sql}
-SELECT c.nome, e.nome
-FROM cidades c
-JOIN estados e
-ON c.estado_id = e.id;
-    \end{minted}
-    
-    \textbf{JOIN} permite:
-    
-    \begin{itemize}
-        \item combinar informações
-        \item evitar duplicação de dados
-        \item modelar relações entre entidades
-    \end{itemize}
-    
-\end{frame}
 
 \begin{frame}[fragile]{Tabelas em bancos relacionais}
     
@@ -255,6 +87,647 @@ ON c.estado_id = e.id;
     \end{itemize}
     
 \end{frame}
+
+\begin{frame}{SQL - Structured Query Language}
+    
+    \textbf{SQL} é a linguagem padrão para manipulação de bancos de dados relacionais.
+    
+    \vspace{0.4cm}
+    
+    Principais usos:
+    
+    \begin{itemize}
+        \item Consultar dados
+        \item Inserir novos registros
+        \item Atualizar registros existentes
+        \item Remover dados
+        \item Definir estrutura de tabelas
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    
+    Bancos que utilizam SQL:
+    
+    \begin{itemize}
+        \item PostgreSQL 
+        \item MySQL
+        \item SQLite (e Geopackage)
+        \item DuckDB
+        \item SQL Server
+    \end{itemize}
+    
+\end{frame}
+
+
+
+\section{Extensões espaciais para bancos de dados}
+
+\begin{frame}{Extensões Espaciais em SGBDs}
+
+\textbf{Objetivo:}
+Adicionar suporte a dados geoespaciais em bancos relacionais.
+
+\vspace{0.3cm}
+
+    \begin{columns}[t]
+    \column{0.5\linewidth}
+    \textbf{Funcionalidades espaciais:}
+    \begin{itemize}
+        \item Tipos geométricos:
+        \begin{itemize}
+            \item Ponto, Linha, Polígono
+        \end{itemize}
+    
+        \item Índices espaciais:
+        \begin{itemize}
+            \item Consultas rápidas por localização
+        \end{itemize}
+    
+        \item Funções espaciais:
+        \begin{itemize}
+            \item Distância
+            \item Interseção
+            \item Buffer
+            \item Área
+        \end{itemize}
+    
+        \item Integração com GIS:
+        \begin{itemize}
+            \item QGIS, GeoPandas, Leafmap
+        \end{itemize}
+    \end{itemize}
+    \column{0.5\linewidth}
+    \textbf{Padrões comun para colunas geométricas:}
+    \begin{itemize}
+        \item OGC Simple Features
+        \item WKT / WKB
+        \item GeoJSON
+    \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Principais Tecnologias Espaciais}
+
+    \begin{table}
+    \centering
+    \scriptsize
+    \begin{tabular}{|p{2.3cm}|p{2.7cm}|p{4.2cm}|}
+    \hline
+    \textbf{Tecnologia} & \textbf{Extensão Espacial} & \textbf{Características} \\
+    \hline
+    
+    MySQL (SGBD)&
+    Spatial Extensions &
+    Suporte espacial integrado. Funções GIS básicas e índices espaciais. \\
+    
+    \hline
+    
+    PostgreSQL (SGDB)&
+    PostGIS &
+    Principal solução open-source GIS. Muito usado com QGIS e GeoPandas. \\
+    
+    \hline
+    
+    SQLite (em arquivo) &
+    SpatiaLite / GeoPackage &
+    Banco leve baseado em arquivo único. Muito usado em aplicações desktop e móveis. \\
+    
+    \hline
+    
+    DuckDB (em pocesso)&
+    Spatial Extension &
+    Foco em analytics e processamento geoespacial local de alta performance. \\
+    
+    \hline
+    
+    \end{tabular}
+    \end{table}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Exemplos de uso:}
+    \begin{itemize}
+        \item PostGIS → servidores GIS
+        \item GeoPackage → intercâmbio de dados
+        \item DuckDB → análise geoespacial local
+    \end{itemize}
+
+\end{frame}
+
+\section{Prática com Postgresql/Postgis}
+\begin{frame}[fragile]{Postgis no Docker}
+    
+    Recuperando nosso container de PostgreSQL+PostGIS da aula passada.
+    
+    \vspace{0.4cm}
+    Iniciando o container
+    \begin{minted}{bash}
+docker start postgis
+    \end{minted}
+
+    Executa o terminal bash dentro do container
+\begin{minted}{bash}
+docker exec -it postgis bash 
+    \end{minted}
+
+    Criando um banco novo (no terminal do container)
+    \begin{minted}{bash}
+createdb geodb -U postgres
+    \end{minted}
+    
+    Conectando ao banco (no terminal do container)
+    \begin{minted}{bash}
+psql -U postgres -d geodb
+    \end{minted}     
+
+Conectando ao banco (fora do terminal do container)
+    \begin{minted}{bash}
+docker exec -it postgis psql -U postgres -d geodb 
+    \end{minted}     
+\end{frame}
+
+\begin{frame}[fragile]{Usuários e Permissões no PostgreSQL/PostGIS}
+
+\textbf{1. Alterar senha do usuário \texttt{postgres}:}
+
+\begin{minted}{sql}
+ALTER USER postgres
+WITH PASSWORD 'nova_senha';
+\end{minted}
+
+\vspace{0.3cm}
+
+\textbf{2. Criar usuário \texttt{aluno}:}
+
+\begin{minted}{sql}
+CREATE USER aluno
+WITH PASSWORD 'senha123';
+\end{minted}
+
+\vspace{0.3cm}
+
+\textbf{3. Permitir conexão ao banco \texttt{geodb}:}
+
+\begin{minted}{sql}
+GRANT CONNECT ON DATABASE geodb TO aluno;
+\end{minted}
+
+\vspace{0.3cm}
+
+\textbf{4. Dar permissões de leitura e escrita:}
+
+\begin{minted}{sql}
+GRANT USAGE ON SCHEMA public TO aluno;
+
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON ALL TABLES IN SCHEMA public
+TO aluno;
+\end{minted}
+
+\vspace{0.3cm}
+
+\textbf{5. Aplicar permissões futuras automaticamente:}
+
+\begin{minted}{sql}
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON TABLES TO aluno;
+\end{minted}
+
+\end{frame}
+
+\begin{frame}{Conectando PostgreSQL no QGIS DB Manager}
+
+\begin{columns}[t]
+\column{0.35\textwidth}
+\textbf{Passos básicos:}
+
+\begin{enumerate}
+    \item Selecionar:
+    \begin{itemize}
+        \item \texttt{Camada - Adicionar camada}
+        \item \texttt{Nova Conexão}
+    \end{itemize}
+
+    \item Informar:
+    \begin{itemize}
+        \item Host: localhost
+        \item Porta (5432)
+        \item Banco: geodb
+        \item Usuário: postgres
+        \item Senha: nova\_senha
+    \end{itemize}
+
+    \item Testar conexão
+\end{enumerate}
+
+\column[t]{0.65\textwidth}
+\begin{figure}
+\centering
+\includegraphics[height=0.2\textheight]{bancos_de_dados_relacionais_figs/QGIS_Connection}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[height=0.45\textheight]{bancos_de_dados_relacionais_figs/QGIS_Connection2}
+\end{figure}
+
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Conectando PostgreSQL no QGIS}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{bancos_de_dados_relacionais_figs/DBManager1}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{bancos_de_dados_relacionais_figs/DBManager2}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{Exemplo SQL: Criando e Inserindo Dados}
+Selecionar o banco \textbf{geodb} e abrir a Janela SQL do DB Manager.  
+
+\vspace{0.3cm}
+\textbf{Criando a tabela \texttt{cidades}:}
+
+\begin{minted}{sql}
+CREATE TABLE cidades (
+    id SERIAL PRIMARY KEY,
+    nome TEXT,
+    populacao INTEGER,
+    longitude REAL,
+    latitude REAL
+);
+\end{minted}
+{\tiny Obs.: o tipo serial é um inteiro que se autoincrementa. Usar id INTEGER PRIMARY KEY AUTOINCREMENT em Spatialite.}
+\vspace{0.3cm}
+
+\textbf{Inserindo registros iniciais:}
+
+\begin{minted}{sql}
+INSERT INTO cidades
+(nome, populacao, longitude, latitude)
+VALUES
+('Rio de Janeiro', 6748000, -43.1729, -22.9068),
+('São Paulo', 12330000, -46.6333, -23.5505),
+('Belo Horizonte', 2531000, -43.9386, -19.9208);
+\end{minted}
+
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Estrutura básica de uma consulta}
+    
+    A operação mais comum em SQL é a consulta de dados usando \texttt{SELECT}.
+    
+    \begin{minted}{sql}
+SELECT coluna1, coluna2
+FROM tabela
+WHERE condicao;
+    \end{minted}
+    
+    Componentes:
+    
+    \begin{itemize}
+        \item \textbf{SELECT} - define as colunas retornadas
+        \item \textbf{FROM} - define a tabela consultada
+        \item \textbf{WHERE} - filtra os registros
+    \end{itemize}
+    
+    Exemplo:
+    
+    \begin{minted}{sql}
+SELECT nome, populacao
+FROM cidades
+WHERE populacao > 3000000;
+    \end{minted}
+    
+\end{frame}
+
+\begin{frame}[fragile]{Inserindo, atualizando e removendo dados}
+    
+    SQL também permite modificar os dados.
+    
+    \vspace{0.3cm}
+    
+    Inserir registros:
+    
+\vspace{0.3cm}
+
+\begin{minted}{sql}
+INSERT INTO cidades (nome, populacao, longitude, latitude)
+VALUES ('Campinas', 1214000, -47.0608, -22.9056);
+\end{minted}
+    
+    Atualizar registros:
+    
+    \begin{minted}{sql}
+UPDATE cidades
+SET populacao = 1300000
+WHERE nome = 'Campinas';
+    \end{minted}
+    
+    Remover registros:
+    
+    \begin{minted}{sql}
+DELETE FROM cidades
+WHERE nome = 'Campinas';
+    \end{minted}
+    
+\end{frame}
+
+\begin{frame}{Extensão Espacial}
+    BDRs podem ser estendidos para armazenar geometrias.
+    
+    \vspace{0.4cm}
+    
+    Exemplo:
+    \begin{itemize}
+        \item \textbf{PostGIS} extensão do PostgreSQL
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    
+    Novo tipo de dado:
+    \begin{itemize}
+        \item GEOMETRY
+        \item GEOGRAPHY
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    
+    Permite armazenar:
+    \begin{itemize}
+        \item Pontos
+        \item Linhas
+        \item Polígonos
+    \end{itemize}
+    E executar consultas espaciais.
+\end{frame}
+
+\begin{frame}{Extensão Espacial - Tabelas geoespaciais}
+    Cada feição espacial é composta por:
+    
+    \begin{itemize}
+        \item Atributos (campos tabulares)
+        \item Geometria (coluna espacial)
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    
+    Estrutura típica:
+    
+    \begin{center}
+\begin{table}
+\centering
+\scriptsize
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{id} & \textbf{nome} & \textbf{area} & \textbf{geom} \\
+\hline
+1 & Rio de Janeiro & 43,696 & MULTIPOLYGON(...) \\
+\hline
+\end{tabular}
+\end{table}
+    \end{center}
+    
+    \vspace{0.4cm}
+    
+    A coluna \texttt{geom} armazena objetos como:
+    
+    \begin{itemize}
+        \item POINT
+        \item LINESTRING
+        \item POLYGON
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{PostgreSQL + PostGIS - Visão Geral}
+    
+    \textbf{PostgreSQL}:
+    \begin{itemize}
+        \item SGBD relacional cliente–servidor
+        \item ACID completo
+        \item Controle de concorrência (MVCC)
+        \item Extensível
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    
+    \textbf{PostGIS}:
+    \begin{itemize}
+        \item Extensão espacial do PostgreSQL
+        \item Adiciona tipos GEOMETRY e GEOGRAPHY
+        \item Implementa padrões OGC Simple Features
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    
+    Resultado:
+    \begin{center}
+        Banco relacional + engine espacial robusta
+    \end{center}
+    
+\end{frame}
+
+\begin{frame}{Conceitos Fundamentais do PostGIS}
+    
+    \textbf{1. Tipo GEOMETRY}
+    \begin{itemize}
+        \item Armazena POINT, LINESTRING, POLYGON, etc.
+        \item Associado a um SRID (sistema de referência)
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{2. Funções Espaciais}
+    
+    \vspace{0.3cm}
+    
+    \textbf{3. Índices Espaciais}
+    \begin{itemize}
+        \item GiST (Generalized Search Tree)
+        \item Filtragem por bounding box
+        \item Otimização de ST\_Intersects, ST\_Within, etc.
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{4. Modelo Cliente–Servidor}
+    \begin{itemize}
+        \item Multiusuário
+        \item Controle transacional
+        \item Ideal para produção
+    \end{itemize}
+    
+\end{frame}
+
+\begin{frame}{Shapefile vs PostgreSQL/PostGIS vs DuckDB Spatial}
+    
+    \resizebox{\textwidth}{!}{
+        \begin{tabular}{l|c|c|c}
+            & Shapefile & PostgreSQL + PostGIS & DuckDB + Spatial \\
+            \hline
+            Multiusuário & Não & Sim & Limitado \\
+            Transações ACID & Não & Sim & Sim \\
+            Cliente–Servidor & Não & Sim & Não \\
+            Instalação & Simples & Servidor dedicado & Arquivo único \\
+            Índice Espacial & .qix & GiST / SP-GiST & R-Tree \\
+            SQL Completo & Não & Sim & Sim \\
+            Escalabilidade & Baixa & Alta & Média \\
+        \end{tabular}
+    }
+    \vspace{0.4cm}
+    
+    \textbf{Posicionamento:}
+    
+    Shapefile $\rightarrow$ formato legado de troca.
+    
+    PostgreSQL + PostGIS $\rightarrow$ infraestrutura robusta multiusuário.
+    
+    DuckDB Spatial $\rightarrow$ banco analítico leve e embarcado.
+\end{frame}
+
+\begin{frame}[fragile]{Inserindo, atualizando e removendo dados}
+    
+    Verificar se o PostGIS está carregado neste banco. 
+    \begin{minted}{sql}
+SELECT PostGIS_Version();
+    \end{minted}
+    Caso não esteja instalado, vai retornar que a função não existe. Para instalar:
+    \begin{minted}{sql}
+CREATE EXTENSION IF NOT EXISTS postgis;
+    \end{minted}
+
+
+    Inserindo uma coluna geometria à partir de colunas lat e lon:
+    
+    \vspace{0.3cm}
+
+    \begin{minted}{sql}
+-- Adiciona a coluna geom (geometria)
+ALTER TABLE cidades
+ADD COLUMN geom geometry(Point, 4326);
+
+-- Preenche a geometria usando longitude e latitude
+UPDATE cidades
+SET geom = ST_SetSRID(
+    ST_MakePoint(longitude, latitude),
+    4326
+);
+    \end{minted}
+Agora é possível visualizar esta tabela no mapa do QGIS!
+
+\end{frame}
+
+\begin{frame}[fragile]{Inserindo dados geoespaciais no PostgreSQL pelo QGIS}
+
+Adicionar a camada vetorial no QGIS (baixando ou pelo URL) 
+
+\url{https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2025/Brasil/BR_UF_2025.zip}
+\begin{columns}
+\column[t]{0.4\textwidth}
+
+- Acessar o DB Manager. \\
+- Escolher a conexão ao PostGIS.\\
+- Importar camada vetorial. \\
+- Carregar no canvas.
+\column[t]{0.6\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{bancos_de_dados_relacionais_figs/Import_shape}
+\end{figure}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]{Operações de agregação}
+    
+    Funções de agregação resumem dados.
+    
+    \begin{minted}{sql}
+SELECT COUNT(*)
+FROM estados;
+    \end{minted}
+    
+    Funções comuns:
+    
+    \begin{itemize}
+        \item \texttt{COUNT()} - número de registros
+        \item \texttt{SUM()} - soma
+        \item \texttt{AVG()} - média
+        \item \texttt{MIN()} - valor mínimo
+        \item \texttt{MAX()} - valor máximo
+    \end{itemize}
+    
+    Exemplo:
+    
+    \begin{minted}{sql}
+SELECT AVG(populacao)
+FROM cidades;
+    \end{minted}
+    
+\end{frame}
+
+\begin{frame}[fragile]{Operações de agregação com GROUP BY e ORDER BY}
+
+\textbf{Agrupando cidades por faixa populacional:}
+
+\begin{minted}{sql}
+SELECT "NM_REGIAO", count(*) AS quantidade_de_estados
+FROM "BR_UF_2025"
+GROUP BY "NM_REGIAO"
+ORDER BY quantidade_de_estados;
+\end{minted}
+
+\vspace{0.3cm}
+
+\textbf{Termos usados:}
+\begin{itemize}
+\item \textbf{AS}: cria um alias (apelido) para uma coluna ou tabela. Muito útil para referenciar colunas geradas por funções (Ex.: Count(*)).
+\item \textbf{GROUP BY}: Agrupa valores iguais em uma coluna. Requer uma função de agregação depois (Ex.: Count() ).
+\item \textbf{ORDER BY}: Ordena pelos valores de uma coluna.
+\end{itemize}
+
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Relacionando tabelas - JOIN}
+    
+    Bancos relacionais permitem combinar dados de várias tabelas.
+    
+    Exemplo de duas tabelas:
+    
+    \begin{itemize}
+        \item cidades
+        \item estados
+    \end{itemize}
+    
+    Consulta com \textbf{JOIN}:
+    
+    \begin{minted}{sql}
+SELECT c.nome, e.nome
+FROM cidades c
+JOIN estados e
+ON c.estado_id = e.id;
+    \end{minted}
+    
+    \textbf{JOIN} permite:
+    
+    \begin{itemize}
+        \item combinar informações
+        \item evitar duplicação de dados
+        \item modelar relações entre entidades
+    \end{itemize}
+    
+\end{frame}
+
+
 
 \begin{frame}[fragile]{Relacionamento entre tabelas (Modelo ER)}
     
@@ -354,88 +827,8 @@ ORDER BY populacao DESC;
 \end{frame}
 
 
-\begin{frame}{Extensão Espacial}
-    BDRs podem ser estendidos para armazenar geometrias.
-    
-    \vspace{0.4cm}
-    
-    Exemplo:
-    \begin{itemize}
-        \item \textbf{PostGIS} extensão do PostgreSQL
-    \end{itemize}
-    
-    \vspace{0.4cm}
-    
-    Novo tipo de dado:
-    \begin{itemize}
-        \item GEOMETRY
-        \item GEOGRAPHY
-    \end{itemize}
-    
-    \vspace{0.4cm}
-    
-    Permite armazenar:
-    \begin{itemize}
-        \item Pontos
-        \item Linhas
-        \item Polígonos
-    \end{itemize}
-    E executar consultas espaciais.
-\end{frame}
 
-\begin{frame}{Shapefile vs PostgreSQL/PostGIS vs DuckDB Spatial}
-    
-    \resizebox{\textwidth}{!}{
-        \begin{tabular}{l|c|c|c}
-            & Shapefile & PostgreSQL + PostGIS & DuckDB + Spatial \\
-            \hline
-            Multiusuário & Não & Sim & Limitado \\
-            Transações ACID & Não & Sim & Sim \\
-            Cliente–Servidor & Não & Sim & Não \\
-            Instalação & Simples & Servidor dedicado & Arquivo único \\
-            Índice Espacial & .qix & GiST / SP-GiST & R-Tree \\
-            SQL Completo & Não & Sim & Sim \\
-            Escalabilidade & Baixa & Alta & Média \\
-        \end{tabular}
-    }
-    \vspace{0.4cm}
-    
-    \textbf{Posicionamento:}
-    
-    Shapefile → formato legado de troca.  
-    
-    PostgreSQL + PostGIS → infraestrutura robusta multiusuário.  
-    
-    DuckDB Spatial → banco analítico leve e embarcado.
-\end{frame}
 
-\begin{frame}{Modelo Espacial}
-    Cada feição espacial é composta por:
-    
-    \begin{itemize}
-        \item Atributos (campos tabulares)
-        \item Geometria (coluna espacial)
-    \end{itemize}
-    
-    \vspace{0.4cm}
-    
-    Estrutura típica:
-    
-    \begin{center}
-        \texttt{id | nome | area | geom}\\
-        \texttt{1  | Rio de Janeiro | 43,696 | MULTIPOLYGON(...)}
-    \end{center}
-    
-    \vspace{0.4cm}
-    
-    A coluna \texttt{geom} armazena objetos como:
-    
-    \begin{itemize}
-        \item POINT
-        \item LINESTRING
-        \item POLYGON
-    \end{itemize}
-\end{frame}
 
 \begin{frame}{Consultas Espaciais}
     Além de consultas tradicionais:
@@ -464,93 +857,6 @@ ORDER BY populacao DESC;
         Selecionar municípios que intersectam um rio.
     \end{center}
 \end{frame}
-
-
-\begin{frame}{PostgreSQL + PostGIS — Visão Geral}
-    
-    \textbf{PostgreSQL}:
-    \begin{itemize}
-        \item SGBD relacional cliente–servidor
-        \item ACID completo
-        \item Controle de concorrência (MVCC)
-        \item Extensível
-    \end{itemize}
-    
-    \vspace{0.4cm}
-    
-    \textbf{PostGIS}:
-    \begin{itemize}
-        \item Extensão espacial do PostgreSQL
-        \item Adiciona tipos GEOMETRY e GEOGRAPHY
-        \item Implementa padrões OGC Simple Features
-    \end{itemize}
-    
-    \vspace{0.4cm}
-    
-    Resultado:
-    \begin{center}
-        Banco relacional + engine espacial robusta
-    \end{center}
-    
-\end{frame}
-
-\begin{frame}{Conceitos Fundamentais do PostGIS}
-    
-    \textbf{1. Tipo GEOMETRY}
-    \begin{itemize}
-        \item Armazena POINT, LINESTRING, POLYGON, etc.
-        \item Associado a um SRID (sistema de referência)
-    \end{itemize}
-    
-    \vspace{0.3cm}
-    
-    \textbf{2. Funções Espaciais}
-    
-    \vspace{0.3cm}
-    
-    \textbf{3. Índices Espaciais}
-    \begin{itemize}
-        \item GiST (Generalized Search Tree)
-        \item Filtragem por bounding box
-        \item Otimização de ST\_Intersects, ST\_Within, etc.
-    \end{itemize}
-    
-    \vspace{0.3cm}
-    
-    \textbf{4. Modelo Cliente–Servidor}
-    \begin{itemize}
-        \item Multiusuário
-        \item Controle transacional
-        \item Ideal para produção
-    \end{itemize}
-    
-\end{frame}
-
-\begin{frame}{Índices Espaciais}
-    Consultas espaciais são custosas.
-    
-    \vspace{0.4cm}
-    
-    Solução: Índices espaciais.
-    
-    \begin{itemize}
-        \item R-Tree
-        \item GiST (PostgreSQL)
-    \end{itemize}
-    
-    \vspace{0.4cm}
-    
-    Benefícios:
-    \begin{itemize}
-        \item Redução drástica de tempo de consulta
-        \item Filtragem por bounding box
-    \end{itemize}
-    
-    \vspace{0.4cm}
-    
-    Sem índice → varredura completa da tabela.
-\end{frame}
-
 
 
 \begin{frame}{Índices Espaciais: Por que são importantes?}
@@ -644,9 +950,9 @@ ORDER BY populacao DESC;
     \textbf{Exemplo em PostGIS:}
     
     \begin{minted}{sql}
-        CREATE INDEX idx_geom
-        ON cidades
-        USING GIST (geom);
+CREATE INDEX idx_geom
+ON cidades
+USING GIST (geom);
     \end{minted}
     
     \textbf{Benefícios:}
@@ -660,79 +966,353 @@ ORDER BY populacao DESC;
     
 \end{frame}
 
+\begin{frame}[fragile]{Exercício: Criação de Índices }
 
-\begin{frame}[fragile]{Consultas Espaciais — Exemplos SQL (PostGIS)}
-    
-    \textbf{1️⃣ Criar tabela espacial}
-    
-    \begin{minted}{sql}
-CREATE TABLE municipios (
-id SERIAL PRIMARY KEY,
-nome TEXT,
-populacao INTEGER,
-geom GEOMETRY(MULTIPOLYGON, 4674)
-);
-    \end{minted}
-    
-    \vspace{0.3cm}
-    
-    \textbf{2️⃣ Criar índice espacial}
-    
-    \begin{minted}{sql}
-CREATE INDEX idx_municipios_geom
-ON municipios
+\textbf{Objetivo:}
+Melhorar desempenho de consultas espaciais e atributos.
+
+\textbf{Tabela}: \texttt{BR\_UF\_2025}
+
+\vspace{0.4cm}
+
+\textbf{Índice espacial (PostGIS):}
+
+\begin{minted}{sql}
+CREATE INDEX idx_br_uf_geom
+ON BR_UF_2025
 USING GIST (geom);
+\end{minted}
+
+\vspace{0.4cm}
+
+\textbf{Índice por código da UF:}
+
+\begin{minted}{sql}
+CREATE INDEX idx_br_uf_cd_uf
+ON BR_UF_2025 (CD_UF);
+\end{minted}
+
+\vspace{0.3cm}
+
+\textbf{Índice por área:}
+
+\begin{minted}{sql}
+CREATE INDEX idx_br_uf_area
+ON BR_UF_2025 (AREA_KM2);
+\end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]{Exercícios SQL}
+    
+    Carregar os arquivos abaixo no QGIS e importar para um banco de dados no PostgreSQL:
+    \begin{enumerate}
+\item ja\_visitei.csv
+\item BR\_UF\_2025.zip (shapefile)
+    \end{enumerate}
+    Também será necessária a tabela cidades, construída anteriormente.
+
+    \vspace{0.3cm}
+    \textbf{Criar uma tabela com o resultado da operação de join de ja\_visitei e "BR\_UF\_2025" }
+    \pause
+    \begin{minted}{sql}
+CREATE table ja_visitei_do_brasil as
+select br.* , ja_visitei.visitei
+from "BR_UF_2025" as br
+join ja_visitei
+on ja_visitei.nome = br.name;
     \end{minted}
-    
+   
 \end{frame}
 
-\begin{frame}{Exercícios PostGIS}
-\begin{enumerate}
-    \item Instalar o PostGIS (Docker recomendado)
-    \item Criar um banco de dados
-    \item Acessar pelo QGIS
-    \item Abrir o DB Manager.
-    \item Criar uma tabela.
-    \item Importar um ShapeFile para o PostGIS.
-\end{enumerate}
+\begin{frame}[fragile]{Exercícios SQL}
     
+    \textbf{Selecionar os estados que contém os pontos da tabela cidades}
+    \pause
+    \begin{minted}{sql}
+SELECT *
+FROm "BR_UF_2025" AS estados, cidades
+WHERE st_intersects( estados.geom, st_setsrid(cidades.geom, 4674));
+    \end{minted}
+    \vspace{0.3cm}  
+
+    \textbf{Adicionar uma coluna uf na tabela cidades, com o resultado da operação de interseção}
+    \pause
+    \begin{minted}{sql}
+ALTER TABLE cidades
+ADD COLUMN uf VARCHAR(2);
+
+UPDATE cidades
+SET uf = estados."SIGLA_UF"
+FROM "BR_UF_2025" AS estados
+WHERE st_intersects( estados.geom, st_setsrid(cidades.geom, 4674));
+    \end{minted}
+
 \end{frame}
 
-\begin{frame}[fragile]{Modelo ER Espacial}
+
+\begin{frame}[fragile]{Modelo UML Espacial}
 % TODO: \usepackage{graphicx} required
 \begin{center}
     \includegraphics[height=0.7\textheight]{bancos_de_dados_relacionais_figs/exemplo_municipios}
 \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{Consultas Espaciais — Exemplos SQL}
-    
-    \textbf{3️⃣ Municípios que intersectam um rio}
-    
-    \begin{minted}{sql}
-SELECT m.nome
-FROM municipios m
-JOIN rios r
-ON ST_Intersects(m.geom, r.geom)
-WHERE r.nome = 'Rio X';
-    \end{minted}
-    
-    \vspace{0.3cm}
-    
-    \textbf{4️⃣ Área em km²}
-    
-    \begin{minted}{sql}
-SELECT nome,
-ST_Area(geom) / 1000000 AS area_km2
-FROM municipios;
-    \end{minted}
-    
+
+\begin{frame}{Exercícios: Implementar a EDGV no PostGIS}
+Implementar usando SQL.
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{bancos_de_dados_relacionais_figs/EDGV_hidro}
+\end{figure}
+
+\hyperlink{https://inde.gov.br/pdf/ET-EDGV_versao_3.0_2018_05_20.pdf}{EDGV 3.0}
+
+\hyperlink{https://inde.gov.br/pdf/ANEXOS_ET_EDGV_3.0_2018_05_20.pdf}{Modelos conceituais da EDGV 3.0 (Anexos)}
 \end{frame}
+
+
+
+\section{Bancos de dados EDGV com DSG Tools}
+
+\begin{frame}{Exercícios: EDGV no PostGIS segundo o DSGTools}
+Abrir no GitHub:
+
+\hyperlink{https://github.com/dsgoficial/DsgTools/tree/master/DsgTools/core/DbModels/PostGIS/3}{edgv3.sql}
+
+\hyperlink{https://github.com/dsgoficial/DsgTools/tree/master/DsgTools/core/DbModels/PostGIS/3_Pro}{edgv3\_pro.sql} 
+
+\hyperlink{https://github.com/dsgoficial/modelagens/blob/master/edgv_300/edgv_300.sql}{Conversor de modelagens (Nova implementação): edgv3.sql}
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{bancos_de_dados_relacionais_figs/DSG_Tools_EDGV.png}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Criação do banco de dados em conformidade com uma EDGV}
+Crie uma nova conexão (não usa a padrão do QGIS).
+
+Para ET-EDGV 3.0 ou ET-EDGV 2.1.3:
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{bancos_de_dados_relacionais_figs/DSG_Tools_CreateDB}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Carregando camadas do banco de dados EDGV}
+Selecionar todas as camadas do banco:
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{bancos_de_dados_relacionais_figs/DSG_Tools_Load_Layers.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Carregando camadas do banco de dados EDGV}
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{bancos_de_dados_relacionais_figs/DSG_Tools_Load_Layers2.png}
+\end{figure}
+\end{frame}
+
+\section{Execução remota de comandos SQL por bibliotecas Python}
+
+\begin{frame}{Conceitos: PostgreSQL e Python}
+
+\textbf{Integração Python + PostgreSQL}
+
+\vspace{0.4cm}
+
+Existem diversas bibliotecas Python que permitem:
+
+\begin{itemize}
+    \item Conectar ao PostgreSQL
+    \item Executar comandos SQL remotamente
+    \item Ler e escrever tabelas
+    \item Trabalhar com dados espaciais do PostGIS
+\end{itemize}
+
+\vspace{0.4cm}
+
+\textbf{Execução remota de SQL}
+
+\begin{itemize}
+    \item O código Python envia comandos SQL ao servidor
+    \item O processamento ocorre no PostgreSQL/PostGIS
+    \item Consultas utilizam índices e otimizações do banco
+\end{itemize}
+
+\vspace{0.4cm}
+
+\textbf{Vantagem:}
+Grandes volumes de dados podem ser processados diretamente no servidor.
+
+\end{frame}
+
+\begin{frame}[fragile]{QtSql: Executando SQL}
+
+\begin{minted}{python}
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+
+db = QSqlDatabase.addDatabase("QPSQL")
+
+db.setHostName("localhost")
+db.setDatabaseName("geodb")
+db.setUserName("postgres")
+db.setPassword("postgres")
+
+db.open()
+
+query = QSqlQuery()
+
+query.exec(""" SELECT nome, populacao FROM cidades """)
+
+while query.next():
+    print(
+        query.value(0),
+        query.value(1)
+    )
+\end{minted}
+
+\end{frame}
+
+
+% =====================================================================
+% SLIDE 1 - OGR
+% =====================================================================
+\begin{frame}[fragile]{OGR: Executando SQL no PostgreSQL/PostGIS}
+
+\begin{minted}{python}
+from osgeo import ogr
+
+conn_str = (
+    "PG:host=localhost "
+    "dbname=geodb "
+    "user=postgres "
+    "password=postgres"
+)
+
+ds = ogr.Open(conn_str)
+
+sql = """ SELECT nome, populacao FROM cidades """
+
+layer = ds.ExecuteSQL(sql)
+
+for feat in layer:
+    print(
+        feat.GetField("nome"),
+        feat.GetField("populacao")
+    )
+\end{minted}
+
+\end{frame}
+
+% =====================================================================
+% SLIDE 2 - GEOPANDAS
+% =====================================================================
+\begin{frame}[fragile]{GeoPandas: Executando SQL}
+
+\begin{minted}{python}
+import geopandas as gpd
+
+from sqlalchemy import create_engine
+
+engine = create_engine(
+    "postgresql://postgres:"
+    "postgres@localhost/geodb"
+)
+
+sql = """ SELECT * FROM cidades """
+
+gdf = gpd.read_postgis(
+    sql,
+    engine,
+    geom_col="geom"
+)
+
+print(gdf.head())
+\end{minted}
+
+\end{frame}
+
+% =====================================================================
+% SLIDE 4 - PSYCOPG
+% =====================================================================
+\begin{frame}[fragile]{Psycopg2: Executando SQL}
+
+\begin{minted}{python}
+import psycopg2
+
+conn = psycopg2.connect(
+    host="localhost",
+    dbname="geodb",
+    user="postgres",
+    password="postgres"
+)
+
+cur = conn.cursor()
+
+sql = """
+SELECT nome, populacao
+FROM cidades
+"""
+
+cur.execute(sql)
+
+for row in cur.fetchall():
+    print(row)
+\end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]{Psycopg2 no QGIS: Executando SQL}
+
+\begin{minted}{python}
+from qgis.core import QgsProviderRegistry
+import psycopg2
+# Nome da conexão configurada no QGIS
+connection_name = 'postgis no docker' 
+# Obtém metadados do provider PostgreSQL
+metadata = QgsProviderRegistry.instance().providerMetadata('postgres')
+# Recupera a conexão salva no QGIS
+conn = metadata.findConnection(connection_name, False)
+uri = conn.uri() # Parâmetros da conexão
+# Conecta no PostgreSQL
+pg_conn = psycopg2.connect(uri)
+cursor = pg_conn.cursor()
+# SQL que será executado
+sql = """ create table teste as select * from cidades; """
+cursor.execute(sql)
+pg_conn.commit()
+print('SQL executado com sucesso.')
+# Importante: Fechar a conexão.
+cursor.close()
+pg_conn.close()
+    \end{minted}
+\end{frame}
+
+\section{Exercícios complementares: PostGIS no QGIS Processing}
+\begin{frame}{Exercícios complementares: PostGIS no QGIS Processing}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{bancos_de_dados_relacionais_figs/DB_processing}
+\end{figure}
+
+\end{frame}
+
+
+
+\section{Exercícios complementares: DuckDB}
+
 
 
 \begin{frame}{O que é DuckDB?}
     
     \textbf{DuckDB} é um banco de dados analítico embutido (embedded OLAP).
+    
+    OLAP (Online Analytical Processing)
     
     \vspace{0.4cm}
     
@@ -794,6 +1374,11 @@ FROM municipios;
     
 \end{frame}
 
+\begin{frame}[fragile]{Laboratório de DuckDB}
+\href{https://colab.research.google.com/github/mauriciodev/progcart/blob/main/aulas/jupyter/duckdb_brasil.ipynb}{Abrir no colab}
+
+\end{frame}
+
 \begin{frame}[fragile]{Instalando DuckDB CLI com Pixi}
     
     O \textbf{Pixi} permite criar ambientes isolados e instalar ferramentas rapidamente.
@@ -803,20 +1388,20 @@ FROM municipios;
     \textbf{1. Criar um novo projeto Pixi}
     
     \begin{minted}{bash}
-        pixi init pixi_env
-        cd pixi_env
+pixi init pixi_env
+cd pixi_env
     \end{minted}
     
     \textbf{2. Instalar o DuckDB CLI}
     
     \begin{minted}{bash}
-        pixi add duckdb-cli
+pixi add duckdb-cli
     \end{minted}
     
     \textbf{3. Executar o DuckDB}
     
     \begin{minted}{bash}
-        pixi run duckdb
+pixi run duckdb
     \end{minted}
     
     \vspace{0.3cm}
@@ -824,7 +1409,7 @@ FROM municipios;
     \textbf{Verificando a instalação}
     
     \begin{minted}{sql}
-        SELECT version();
+SELECT version();
     \end{minted}
     
     \begin{itemize}
@@ -866,7 +1451,7 @@ LIMIT 10;
     
 \end{frame}
 
-\begin{frame}[fragile]{Exemplo — DuckDB + Spatial em Python}
+\begin{frame}[fragile]{Exemplo - DuckDB + Spatial em Python}
     
     \textbf{Instalação (uma vez):}
     \begin{minted}{bash}
@@ -890,7 +1475,7 @@ con.execute("LOAD spatial;")
     
 \end{frame}
 
-\begin{frame}[fragile]{Exemplo — DuckDB + Spatial em Python}
+\begin{frame}[fragile]{Exemplo - DuckDB + Spatial em Python}
     \begin{minted}{python}
 # cria tabela espacial
 con.execute("""
@@ -914,22 +1499,22 @@ print(result)
     \end{minted}
 \end{frame}
 
-\begin{frame}[fragile]{Exemplo — Download de Shapefile + DuckDB Spatial}
+\begin{frame}[fragile]{Exemplo - Download de Shapefile + DuckDB Spatial}
     
     \begin{minted}{python}
 import requests, zipfile, io
 import duckdb
 
-# 1️⃣ Download (Natural Earth - países 110m, leve)
+# 1.Download (Natural Earth - países 110m, leve)
 url = "https://naturalearth.s3.amazonaws.com/110m_cultural/ne_110m_admin_0_countries.zip"
 response = requests.get(url)
 response.raise_for_status()
 
-# 2️⃣ Extrai zip em memória
+# 2.Extrai zip em memória
 with zipfile.ZipFile(io.BytesIO(response.content)) as z:
     z.extractall("ne_countries")
 
-# 3️⃣ Conecta ao DuckDB
+# 3.Conecta ao DuckDB
 con = duckdb.connect("world.duckdb")
 con.execute("INSTALL spatial;")
 con.execute("LOAD spatial;")
@@ -938,17 +1523,17 @@ con.execute("LOAD spatial;")
     
 \end{frame}
 
-\begin{frame}[fragile]{Exemplo — Download de Shapefile + DuckDB Spatial}
+\begin{frame}[fragile]{Exemplo - Download de Shapefile + DuckDB Spatial}
     
     \begin{minted}{python}
-# 4️⃣ Lê shapefile direto via GDAL
+# 4.Lê shapefile direto via GDAL
 con.execute("""
     CREATE TABLE countries AS
     SELECT * FROM ST_Read(
     'ne_countries/ne_110m_admin_0_countries.shp');
 """)
 
-# 5️⃣ Calcula área (m² — CRS 4326->3857)
+# 5.Calcula área (m² - CRS 4326$\rightarrow$3857)
 result = con.execute("""
     SELECT NAME,
     ST_Area(ST_Transform(geom, 3857)) AS area
